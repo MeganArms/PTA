@@ -1,4 +1,4 @@
-function [Path, Displacement, numSteps] = findSteps(data,cf)
+function [Path, Displacement, numSteps] = findSteps(data,cf,exptime)
 
 % FINDSTEPS finds the path distance, the path's total displacement and the
 % number of steps in each path for the trajectories in DATA. Input:
@@ -6,6 +6,7 @@ function [Path, Displacement, numSteps] = findSteps(data,cf)
 %   mapping out the trajectory of a particle 
 %   - CF: conversion factor to get from coordinates in DATA to microns -
 %   must know what input and output units you're dealing with!
+%   - EXPTIME: time between the start of exposures in seconds
 % Output:
 %   - PATH: cell array with the distance between each step in a trajectory
 %   separated into cells by trajectory, and separated into columns by i and
@@ -56,10 +57,10 @@ for i = 1:length(data)
 %     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % vvv Actual analysis below vvv
-    if length(data{i,1}) < 100
+    %if length(data{i,1}) < 10/exptime
         EucDist{i} = squareform(pdist(data{i,1})); % Store the Euclidean distances of each trajectory in the cell array EucDist
         S = EucDist{i}; % Convert the distplacements into the squareform so that it's easier to extract the distances between a given number of points
-        for j = 1:maxNumSteps
+        for j = 1:(10/exptime)
             try % Use try-catch for when j goes beyond the dimensions of the current trajectory
                 if i > 1
                     Displacement{j} = [Displacement{j}; diag(S,j)*cf]; % Concatenate with the previous diagonal
@@ -70,14 +71,14 @@ for i = 1:length(data)
                 continue
             end
         end
-    end
+    %end
 end
 
 % Remove zeros that were preallocated space from the Displacement cell
 % array
 for i = 1:length(Displacement)
     Displacement{i} = Displacement{i}(Displacement{i} ~= 0);
-    Displacement{i} = Displacement{i}(1:end-1);
+    % Displacement{i} = Displacement{i}(1:end-1);
 end
 Displacement = Displacement(~cellfun(@isempty,Displacement));
 
