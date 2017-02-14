@@ -23,7 +23,7 @@ for i = 1:trajlength
         obj.Molecule(mIndex).Motility_flag = 'Bulk';
         obj.Molecule(mIndex).Aggregate_flag = 'Unknown';
     % elseif traj(i,1) < 1 && sum(traj(:,1)) >= 1
-    elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1 && traj(i,1) < 1
+    elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1 && traj(i,1) < 1 || sum(diff(inds(traj(:,1) >= 1)) > 1) >=1 && traj(i,1) < 1 || sum(traj(:,1) < 1) == 1 && traj(i,1) < 1
         obj.Molecule(mIndex).Motility_flag = 'Levy'; 
         obj.Molecule(mIndex).Aggregate_flag = [];
     elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(1,1) < 1 && traj(i,1) < 1
@@ -32,11 +32,11 @@ for i = 1:trajlength
     elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(end,1) < 1 && traj(i,1) < 1
         obj.Molecule(mIndex).Motility_flag = 'Desorbed';
         obj.Molecule(mIndex).Aggregate_flag = [];
-    elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1 && traj(i,1) >= 1 && traj(i,2) <= 25
+    elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1 && traj(i,1) >= 1 && traj(i,2) <= 25 || sum(diff(inds(traj(:,1) >= 1)) > 1) >=1 && traj(i,1) >= 1 && traj(i,2) <= 25
         obj.Molecule(mIndex).Motility_flag = 'Surface'; 
         obj.Molecule(mIndex).Aggregate_flag = 'Single';
         samat(i) = false;
-    elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1 && traj(i,1) >= 1 && traj(i,2) > 25
+    elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1 && traj(i,1) >= 1 && traj(i,2) > 25 || sum(diff(inds(traj(:,1) >= 1)) > 1) >=1 && traj(i,1) >= 1 && traj(i,2) > 25
         obj.Molecule(mIndex).Motility_flag = 'Surface'; 
         obj.Molecule(mIndex).Aggregate_flag = 'Aggregate';
         samat(i) = true;
@@ -58,6 +58,13 @@ for i = 1:trajlength
         obj.Molecule(mIndex).Motility_flag = 'Adsorbed';
         obj.Molecule(mIndex).Aggregate_flag = 'Aggregate';
         samat(i) = true;
+    elseif sum(traj(:,1) < 1) == 0 && traj(i,2) <= 25
+        obj.Molecule(mIndex).Motility_flag = 'Surface';
+        obj.Molecule(mIndex).Aggregate_flag = 'Aggregate';
+    elseif sum(traj(:,1) < 1) == 0 && traj(i,2) > 25
+        obj.Molecule(mIndex).Motility_flag = 'Surface';
+        obj.Molecule(mIndex).Aggregate_flag = 'Aggregate';
+        
 %     elseif traj(i,1) >= 1 && traj(i,2) <= 25
 %         obj.Molecule(mIndex).Motility_flag = 'Surface';
 %         obj.Molecule(mIndex).Aggregate_flag = 'Single';
@@ -70,7 +77,7 @@ for i = 1:trajlength
 end
 
 % Assign aggregate status for levy flights
-if sum(diff(inds(traj(:,1) < 1)) > 1) >= 0 && sum(traj(:,1) < 1) < trajlength
+if sum(traj(:,1) < 1) > 0 && sum(traj(:,1) < 1) < trajlength
 % if sum(traj(:,1)) >= 1
     for i = 1:trajlength
         mIndex = molInds(i);
