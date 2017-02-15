@@ -23,50 +23,51 @@ for i = 1:length(Result)
         traj(j,3) = Molecule(mIndex).Eccentricity;
     end
     % Classify molecules
-    classifyMolecules(obj,traj,molInds);
-    
-    % Classify current trajectory
-    % Euler number < 1 indicates a hole in the object, which indicates bulk 
-    % diffusion
-    if sum(traj(:,1)) < 1
-        obj.Result(i).Motility_flag = 'Bulk';
-        Bulk(k).trajectory = molInds; k = k + 1;
-        obj.Result(i).Aggregate_flag = 'Unknown';
-        Unknown(l).trajectory = molInds; l = l + 1;
-    % Euler number < 1 indicates a hole in the object, if the whole
-    % trajectory does NOT have EN < 1, then at some point it is on the
-    % surface, making it a Levy flight.
-    elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1
-        obj.Result(mIndex).Motility_flag = 'Levy';
-        Levy(m).trajectory = molInds; m = m + 1;
-    elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(1,1) < 1
-        obj.Result(mIndex).Motility_flag = 'Adsorption';
-        Adsorption(q).trajectory = molInds; q = q + 1;
-    elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(end,1) < 1
-        obj.Result(mIndex).Motility_flag = 'Desorption';
-        Desorption(r).trajectory = molInds; r = r + 1;
-%     elseif sum(traj(:,1)) >= 1 && sum(traj(:,1) < 1) >= 1 %If at some point it is on the surface and at some point it is off the surface
-%         obj.Result(i).Motility_flag = 'Levy';
-%         Levy(m).trajectory = molInds; m = m + 1;
-    % If the Euler is never < 1, the molecule remains on the surface the
-    % entire time
-    elseif sum(traj(:,1) < 1) == 0 % If it is never off the surface 
-        obj.Result(i).Motility_flag = 'Surface';
-        Surface(n).trajectory = molInds; n = n + 1;
+    if size(traj,1) > 2
+        classifyMolecules(obj,traj,molInds);
+
+        % Classify current trajectory
+        % Euler number < 1 indicates a hole in the object, which indicates bulk 
+        % diffusion
+        if sum(traj(:,1) < 1) == size(traj,1)
+            obj.Result(i).Motility_flag = 'Bulk';
+            Bulk(k).trajectory = molInds; k = k + 1;
+            obj.Result(i).Aggregate_flag = 'Unknown';
+            Unknown(l).trajectory = molInds; l = l + 1;
+        % Euler number < 1 indicates a hole in the object, if the whole
+        % trajectory does NOT have EN < 1, then at some point it is on the
+        % surface, making it a Levy flight.
+        elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1
+            obj.Result(i).Motility_flag = 'Levy';
+            Levy(m).trajectory = molInds; m = m + 1;
+        elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(1,1) < 1
+            obj.Result(i).Motility_flag = 'Adsorption';
+            Adsorption(q).trajectory = molInds; q = q + 1;
+        elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(end,1) < 1
+            obj.Result(i).Motility_flag = 'Desorption';
+            Desorption(r).trajectory = molInds; r = r + 1;
+    %     elseif sum(traj(:,1)) >= 1 && sum(traj(:,1) < 1) >= 1 %If at some point it is on the surface and at some point it is off the surface
+    %         obj.Result(i).Motility_flag = 'Levy';
+    %         Levy(m).trajectory = molInds; m = m + 1;
+        % If the Euler is never < 1, the molecule remains on the surface the
+        % entire time
+        elseif sum(traj(:,1) < 1) == 0 % If it is never off the surface 
+            obj.Result(i).Motility_flag = 'Surface';
+            Surface(n).trajectory = molInds; n = n + 1;
+        end
+        % Beads with an area <= 25 are single beads, larger are aggregates. If
+        % there is a mix within one trajectory, assume aggregate.
+        if sum(traj(:,2) > 25) >= 1 && sum(traj(:,2) <= 25) == 0 && ~strcmp(obj.Result(i).Motility_flag,'Bulk')
+            obj.Result(i).Aggregate_flag = 'Aggregate';
+            Aggregate(o).trajectory = molInds; o = o + 1;
+        elseif sum(traj(:,2) <= 25) >= 1 && sum(traj(:,2) > 25) == 0 && ~strcmp(obj.Result(i).Motility_flag,'Bulk')
+            obj.Result(i).Aggregate_flag = 'Single';
+            Single(p).trajectory = molInds; p = p + 1;
+        elseif sum(traj(:,2) <= 25) >= 1 && sum(traj(:,2) > 25) >= 1 && ~strcmp(obj.Result(i).Motility_flag,'Bulk')
+            obj.Result(i).Aggregate_flag = 'Aggregate';
+            Aggregate(o).trajectory = molInds; o = o + 1;
+        end
     end
-    % Beads with an area <= 25 are single beads, larger are aggregates. If
-    % there is a mix within one trajectory, assume aggregate.
-    if sum(traj(:,2) > 25) >= 1 && sum(traj(:,2) <= 25) == 0 && ~strcmp(obj.Result(i).Motility_flag,'Bulk')
-        obj.Result(i).Aggregate_flag = 'Aggregate';
-        Aggregate(o).trajectory = molInds; o = o + 1;
-    elseif sum(traj(:,2) <= 25) >= 1 && sum(traj(:,2) > 25) == 0 && ~strcmp(obj.Result(i).Motility_flag,'Bulk')
-        obj.Result(i).Aggregate_flag = 'Single';
-        Single(p).trajectory = molInds; p = p + 1;
-    elseif sum(traj(:,2) <= 25) >= 1 && sum(traj(:,2) > 25) >= 1 && ~strcmp(obj.Result(i).Motility_flag,'Bulk')
-        obj.Result(i).Aggregate_flag = 'Aggregate';
-        Aggregate(o).trajectory = molInds; o = o + 1;
-    end
-   
 %     numHoles = sum(traj(:,1) < 1);
 %     if numHoles >= 1
 %         holes_at = molInds(traj(:,1) < 1);
