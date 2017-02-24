@@ -5,11 +5,17 @@ MSD = cellfun(@mean,SD);
 sd = cellfun(@std,displacements);
 SEM = sd./sqrt(cellfun(@length,displacements));
 
+maxstep = length(MSD);
+if maxstep > 4
+    maxstep = 4;
+end
+
 timevec = exptime:exptime:exptime*length(MSD);
 
+
 fitopt = fitoptions('poly1');
-fitopt.Weights = SEM;
-f = fit(timevec',MSD,'poly1',fitopt);
+fitopt.Weights = SEM(1:maxstep);
+f = fit(timevec(1:maxstep)',MSD(1:maxstep),'poly1',fitopt);
 ci = confint(f);
 D = f.p1/4; D_er = (ci(3) - ci(1))/2;
 rho = MSD(1); rho_er = SEM(1);

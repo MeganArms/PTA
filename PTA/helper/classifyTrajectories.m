@@ -37,10 +37,10 @@ for i = 1:length(Result)
         % Euler number < 1 indicates a hole in the object, if the whole
         % trajectory does NOT have EN < 1, then at some point it is on the
         % surface, making it a Levy flight.
-        elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1
+        elseif sum(diff(inds(traj(:,1) < 1)) > 1) >= 1 || sum(diff(inds(traj(:,1) >= 1)) > 1) >=1
             obj.Result(i).Motility_flag = 'Levy';
             Levy(m).trajectory = molInds; m = m + 1;
-        elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(1,1) < 1
+        elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(1,1) < 1  
             obj.Result(i).Motility_flag = 'Adsorption';
             Adsorption(q).trajectory = molInds; q = q + 1;
         elseif sum(diff(inds(traj(:,1) < 1)) > 1) == 0 && traj(end,1) < 1

@@ -22,7 +22,8 @@ if Option.exclude ~= 0
     y1 = Option.exclude(1,2);
     x2 = Option.exclude(2,1);
     y2 = Option.exclude(2,2);
-    img_2(x1:x2,y1:y2) = 0;
+    img_2 = imadjust(img_2);
+    img_2(x1:x2,y1:y2) = min(img_2(:));
 end
 if Option.include
     minval = Option.include(1,1);
@@ -32,8 +33,10 @@ if Option.include
     img_2 = padarray(I,[topad topad],background,'both');
 end
 img2 = double(img_2);
-th2 = mean(img2(:)) + 2*std(img2(:));
-th = mean(img2(:)) + 2.5*std(img2(:));
+% th2 = mean(img2(:)) + 2*std(img2(:));
+% th = mean(img2(:)) + 2.5*std(img2(:));
+[~,e] = histcounts(img2,100);
+th = e(100); th2 = e(85);
 obj.Frame(k).Threshold = th;
 BW = imbinarize(img2,th);
 altBW = imbinarize(img2,th2);
@@ -52,7 +55,7 @@ testmat8 = zeros(M+2,N+2); testmat8(2:end-1,1:end-2) = BW;
 tallymat = BWpad + testmat1 + testmat2 + testmat3 + testmat4 + testmat5 ...                                                                                          
     + testmat6 + testmat7 + testmat8;
 
-BW2 = logical(BW.*(tallymat(2:end-1,2:end-1) > 1)); % if >1 -> there's a particle
+BW2 = logical(BW.*(tallymat(2:end-1,2:end-1) > 2)); % if >1 -> there's a particle
 
 % BW2 = imclose(BW,strel('diamond',3));
 CC = regionprops(BW2,'PixelIdxList');
