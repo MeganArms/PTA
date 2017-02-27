@@ -18,7 +18,7 @@ fitopt.Weights = SEM(1:maxstep);
 f = fit(timevec(1:maxstep)',MSD(1:maxstep),'poly1',fitopt);
 ci = confint(f);
 D = f.p1/4; D_er = (ci(3) - ci(1))/2;
-rho = MSD(1); rho_er = SEM(1);
+rho = f.p2; rho_er = (ci(4) - ci(2))/2;
 if strcmp(plotting,'on')
     figure,errorbar(timevec,MSD,SEM,'ko');
     hold on, plot(f), hold off
