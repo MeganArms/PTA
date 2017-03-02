@@ -86,7 +86,7 @@ for i = 1:length(pts)
     if currentTraj(i) ~= 0
         text((double(pts(i,2))+4),double(pts(i,1)),sprintf('%d %s, %s',...
             currentTraj(i),Result(currentTraj(i)).Motility_flag,...
-            Result(currentTraj(i)).Aggregate_flag),'Color','g');
+            Result(currentTraj(i)).Aggregate_flag),'FontSize',14,'Color','g');
     end
 end
 

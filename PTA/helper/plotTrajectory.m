@@ -49,10 +49,10 @@ for i = 1:size(path,1)
         coords = [coords; Molecule(mIndex).coordinate];
     end
     imshow(imcomplement(img_1))
-    hold on, plot(coords(:,2),coords(:,1),'bo-','MarkerFaceColor','b'), hold off
+    hold on, plot(coords(:,2),coords(:,1),'b-','MarkerFaceColor','b'), hold off
     text((double(coords(i,2))+4),double(coords(i,1)),sprintf('%s, %s',...
             Molecule(mIndex).Motility_flag,...
-            Molecule(mIndex).Aggregate_flag),'Color','b');
+            Molecule(mIndex).Aggregate_flag),'Color','b','FontSize',14);
     B(i) = getframe;
     
 end
