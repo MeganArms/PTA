@@ -8,14 +8,16 @@ img = RawImage;
 img = imcomplement(img);
 if strcmp(Option.illumination,'on')
     % Modified tophat filtering to remove uneven background
-    img1 = imopen(img,strel('diamond',15));
-    img2 = imgaussfilt(img1,14);
-    img3 = img - img2;
-    img4 = img3 + abs(min(img3(:)));
-    img5 = img4/max(img4(:));
-    img_2 = imadjust(img5);
+%     img1 = imopen(img,strel('diamond',15));
+%     img2 = imgaussfilt(img1,14);
+%     img3 = img - img2;
+%     img4 = img3 + abs(min(img3(:)));
+%     img5 = img4/max(img4(:));
+%     img_2 = imadjust(img5);
+    img1 = imtophat(img,strel('diamond',5));
+    img2 = convert2double(img1);
 else
-    img_2 = imadjust(img);
+    img2 = convert2double(img);
 end
 if Option.exclude ~= 0
     x1 = Option.exclude(1,1);
@@ -32,11 +34,11 @@ if Option.include
     topad = (M - (maxval-minval+1))/2;
     img_2 = padarray(I,[topad topad],background,'both');
 end
-img2 = double(img_2);
-% th2 = mean(img2(:)) + 2*std(img2(:));
-% th = mean(img2(:)) + 2.5*std(img2(:));
-[~,e] = histcounts(img2,100);
-th = e(100); th2 = e(85);
+% img2 = double(img_2);
+th2 = mean(img2(:)) + 3*std(img2(:));
+th = mean(img2(:)) + 4*std(img2(:));
+% [~,e] = histcounts(img2,100);
+% th = e(100); th2 = e(85);
 obj.Frame(k).Threshold = th;
 BW = imbinarize(img2,th);
 altBW = imbinarize(img2,th2);
