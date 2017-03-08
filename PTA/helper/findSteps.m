@@ -1,4 +1,4 @@
-function [Path, Displacement, numSteps] = findSteps(data,cf,exptime)
+function Displacement = findSteps(data,cf,exptime)
 
 % FINDSTEPS finds the path distance, the path's total displacement and the
 % number of steps in each path for the trajectories in DATA. Input:
@@ -59,8 +59,13 @@ for i = 1:length(data)
     % vvv Actual analysis below vvv
     %if length(data{i,1}) < 10/exptime
         EucDist{i} = squareform(pdist(data{i,1})); % Store the Euclidean distances of each trajectory in the cell array EucDist
-        S = EucDist{i}; % Convert the distplacements into the squareform so that it's easier to extract the distances between a given number of points
-        for j = 1:(10/exptime)
+        S = EucDist{i}; % Convert the displacements into the squareform so that it's easier to extract the distances between a given number of points
+        if exptime < 1
+            maxDisplacement = 10/exptime;
+        else
+            maxDisplacement = size(S,1);
+        end
+        for j = 1:maxDisplacement
             try % Use try-catch for when j goes beyond the dimensions of the current trajectory
                 if i > 1
                     Displacement{j} = [Displacement{j}; diag(S,j)*cf]; % Concatenate with the previous diagonal
