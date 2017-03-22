@@ -14,7 +14,7 @@ for i = 1:length(Result)
     traj = zeros(length(molInds),3);
     for j = 1:length(molInds)
         mIndex = molInds(j);
-        if ~isempty(Molecule(mIndex).altEN)
+        if isfield(Molecule,'altEN') && ~isempty(Molecule(mIndex).altEN)
             traj(j,1) = Molecule(mIndex).altEN;
         else
             traj(j,1) = Molecule(mIndex).EulerNumber;
